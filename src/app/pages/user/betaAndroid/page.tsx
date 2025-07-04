@@ -1,0 +1,53 @@
+'use client'
+
+import { HeaderAdmin } from '@/Components/HeaderAdmin'
+import ORELInsider from '@/Components/ORELInsider'
+import { useEffect, useState } from 'react'
+
+type User = {
+	name: string
+	email: string
+	password?: string
+} | null
+
+export default function UserPage() {
+	const [user, setUser] = useState<User>(null)
+	const [newPassword, setNewPassword] = useState('')
+
+	useEffect(() => {
+		const userString = localStorage.getItem('user')
+		if (userString) {
+			setUser(JSON.parse(userString))
+		} else {
+			window.location.href = 'auth'
+		}
+	}, [])
+
+	if (user) {
+		const updatedUser = { ...user, password: newPassword }
+		localStorage.setItem('user', JSON.stringify(updatedUser))
+	}
+
+	if (!user) return null
+
+	return (
+		<span>
+			<HeaderAdmin user={user.name[0]} />
+			<div className='border border-blue-900/50 backdrop-blur-7xl p-10 m-10 rounded-2xl bg-gray-950/40 shadow-2xl shadow-blue-950'>
+				<h1 className='text-5xl mb-6 font-extrabold'>
+					Beta версии программ для Windows:
+				</h1>
+				<div className='flex justify-center items-center gap-4'>
+					<div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+						<img src="/logo.png" width={256} height={256} className='rounded-2xl' alt="OREL Browser" />
+						<h1 className='text-xl font-bold'>OREL Browser</h1>
+						<p className='text-md font-normal'>Версия: BETA</p>
+						<p className='text-md font-normal'>Начало разработки: 2024</p>
+						<p className='text-md font-normal mb-2'>Конец разработки: 2025</p>
+						<a href='https://mega.nz/file/oqVHyBjB#kb-a0jZHt6WYGU3LyN9LW0Xwg8HY8CPe4WSy7izEoR4' className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'>Скачать</a>
+					</div>
+				</div>
+			</div>
+		</span>
+	)
+}
