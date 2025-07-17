@@ -32,7 +32,7 @@ export default function UserPage() {
 
 	return (
 		<span>
-			<HeaderAdmin user={user.name[0]} />
+			<HeaderAdmin />
 			<div className='border border-blue-900/50 backdrop-blur-7xl p-10 m-10 rounded-2xl bg-gray-950/40 shadow-2xl shadow-blue-950'>
 				<h1 className='text-5xl mb-6 font-extrabold'>
 					Beta версии программ для Windows:

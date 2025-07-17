@@ -1,9 +1,11 @@
 'use client'
 
-import { HeaderAdmin } from '@/Components/HeaderAdmin'
 import { useEffect, useState } from 'react'
+import { supabase } from '@/utils/supabase'
+import { HeaderAdmin } from '@/Components/HeaderAdmin'
 
 type User = {
+  id: string
   name: string
   email: string
   password?: string
@@ -12,20 +14,45 @@ type User = {
 export default function UserPage() {
   const [user, setUser] = useState<User>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpenN, setModalOpenN] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [message, setMessage] = useState('')
-  const [modalOpenN, setModalOpenN] = useState(false)
   const [newName, setNewName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [message, setMessage] = useState('')
 
+  // Загрузка пользователя и имени из Supabase
   useEffect(() => {
-    const userString = localStorage.getItem('user')
-    if (userString) {
-      setUser(JSON.parse(userString))
-    } else {
-      window.location.href = 'auth'
+    const fetchUser = async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        window.location.href = '/auth'
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profile) {
+        window.location.href = '/auth'
+        return
+      }
+
+      setUser({
+        id: profile.id,
+        name: profile.username,
+        email: user.email || '',
+      })
     }
+
+    fetchUser()
   }, [])
 
   const openModal = () => {
@@ -34,20 +61,23 @@ export default function UserPage() {
     setConfirmPassword('')
     setModalOpen(true)
   }
+
+  const closeModal = () => setModalOpen(false)
+
   const openModalN = () => {
     setMessage('')
     setNewName('')
     setModalOpenN(true)
   }
 
-  const closeModal = () => setModalOpen(false)
   const closeModalN = () => setModalOpenN(false)
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    setMessage('')
 
-    if (newPassword.length < 6) {
-      setMessage('Пароль должен быть не менее 6 символов')
+    if (newPassword.length < 8) {
+      setMessage('Пароль должен быть не менее 8 символов')
       return
     }
 
@@ -56,137 +86,140 @@ export default function UserPage() {
       return
     }
 
-    if (user) {
-      const updatedUser = { ...user, password: newPassword, name: newName }
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-      setUser(updatedUser)
-      setMessage('Пароль успешно обновлен')
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
 
-      setTimeout(() => {
-        closeModal()
-      }, 1500)
+    if (error) {
+      setMessage('Ошибка обновления пароля: ' + error.message)
+    } else {
+      setMessage('Пароль успешно обновлён')
+      setTimeout(closeModal, 1500)
     }
   }
 
-  const handleChangeName = (e: React.FormEvent) => {
+  const handleChangeName = async (e: React.FormEvent) => {
     e.preventDefault()
+    setMessage('')
+    const trimmedName = newName.trim()
 
-    if (newName.length < 1) {
-      setMessage('Имя должен быть не менее 1 символов')
+    if (trimmedName.length < 1) {
+      setMessage('Имя должно быть не менее 1 символа')
       return
     }
 
-    if (user) {
-      const updatedUser = { ...user, name: newName }
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-      setUser(updatedUser)
-      setMessage('Имя успешно обновлен')
-
-      setTimeout(() => {
-        closeModalN()
-      }, 1500)
+    if (!user?.id) {
+      setMessage('Пользователь не найден')
+      return
     }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ username: trimmedName })
+      .eq('id', user.id)
+
+    if (error) {
+      setMessage('Ошибка обновления имени: ' + error.message)
+      return
+    }
+
+    setUser({ ...user, name: trimmedName })
+    setMessage('Имя успешно обновлено')
+    setTimeout(closeModalN, 1500)
   }
-  if (!user) return null
 
-  const handleDeleteAccount = () => {
-    const userString = localStorage.getItem('user')
-    const usersString = localStorage.getItem('users')
+  const handleDeleteAccount = async () => {
+    if (!user?.id) {
+      alert('Пользователь не найден')
+      return
+    }
 
-    if (!userString || !usersString) return
+    const { error: deleteError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', user.id)
 
-    const currentUser = JSON.parse(userString)
-    const users = JSON.parse(usersString)
+    if (deleteError) {
+      alert('Ошибка при удалении профиля: ' + deleteError.message)
+      return
+    }
 
-    // Удаляем пользователя из массива users по email
-    const updatedUsers = users.filter((u: any) => u.email !== currentUser.email)
+    const { error: signOutError } = await supabase.auth.signOut()
+    if (signOutError) {
+      alert('Ошибка при выходе: ' + signOutError.message)
+      return
+    }
 
-    // Сохраняем обновлённый массив пользователей
-    localStorage.setItem('users', JSON.stringify(updatedUsers))
-
-    // Удаляем текущего пользователя
-    localStorage.removeItem('user')
-
-    // Перенаправляем на /auth
     window.location.href = '/pages/auth'
   }
 
   const handleOutAccount = () => {
-    window.location.href = '/'
+    supabase.auth.signOut().then(() => {
+      window.location.href = '/'
+    })
   }
+
+  if (!user) return null
 
   return (
     <span>
-      <HeaderAdmin user={user.name[0]} />
+      <HeaderAdmin />
       <div className='border border-blue-900/50 backdrop-blur-7xl p-10 m-10 rounded-2xl bg-gray-950/40 shadow-2xl shadow-blue-950'>
         <h1 className='text-5xl mb-6 font-extrabold'>Ваш профиль:</h1>
-        <div className='w-full mb-6'>
-          <div className='float-left'>
-            <p className=''>Имя: {user.name}</p>
-          </div>
-          <div className='float-right'>
-            <button
-              onClick={openModalN}
-              className='mb-8 bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition'
-            >
-              Сменить Имя
-            </button>
-          </div>
+
+        <div className='w-full mb-6 flex justify-between items-center'>
+          <p>Имя: {user.name}</p>
+          <button
+            onClick={openModalN}
+            className='bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition'
+          >
+            Сменить Имя
+          </button>
         </div>
-        <br />
-        <br />
+
         <p className='mb-2'>Эл. почта: {user.email}</p>
 
-        <div className='w-full mb-6'>
-          <div className='float-left'>
-            <p className=''>Пароль: {'*'.repeat(user.password?.length || 0)}</p>
-          </div>
-          <div className='float-right'>
-            <button
-              onClick={openModal}
-              className='mb-8 bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition'
-            >
-              Сменить пароль
-            </button>
-          </div>
+        <div className='w-full mb-6 flex justify-between items-center'>
+          <p>Пароль: {'*'.repeat(user.password?.length || 8)}</p>
+          <button
+            onClick={openModal}
+            className='bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition'
+          >
+            Сменить пароль
+          </button>
         </div>
 
-        <button
+        <div className='flex justify-end gap-4 mt-10'>
+          <button
             onClick={handleOutAccount}
-            className='mt-10 bg-red-600/50 px-4 py-2 rounded hover:bg-red-700/50 transition float-right hover:scale-110 mr-4'
+            className='bg-red-600/50 px-4 py-2 rounded hover:bg-red-700/50 transition hover:scale-110'
           >
-            Выход аккаунт
+            Выйти
           </button>
           <button
             onClick={handleDeleteAccount}
-            className='mt-10 bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition hover:scale-110 float-right -mr-78'
+            className='bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition hover:scale-110'
           >
             Удалить аккаунт
           </button>
-        <br />
-        <br />
+        </div>
 
-        {/* Модальное окно */}
+        {/* Модалка смены пароля */}
         {modalOpen && (
           <div
-            className='fixed inset-0 flex items-center justify-center bg-gray-950/20 backdrop-blur-3xl bg-opacity-70 z-50 text-white'
+            className='fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 text-white'
             onClick={closeModal}
           >
             <div
               className='bg-gray-900 rounded-lg p-6 w-full max-w-md'
-              onClick={e => e.stopPropagation()} // Чтобы клик по модалке не закрывал
+              onClick={e => e.stopPropagation()}
             >
               <h2 className='text-xl mb-4'>Сменить пароль</h2>
-              <form
-                onSubmit={handleChangePassword}
-                className='flex flex-col gap-4'
-              >
+              <form onSubmit={handleChangePassword} className='flex flex-col gap-4'>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder='Новый пароль'
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
-                  className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
+                  className='p-2 text-lg text-center border border-gray-800 rounded-2xl outline-none'
                   required
                 />
                 <input
@@ -194,13 +227,13 @@ export default function UserPage() {
                   placeholder='Подтвердите новый пароль'
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
+                  className='p-2 text-lg text-center border border-gray-800 rounded-2xl outline-none'
                   required
                 />
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
-                  className='text-white cursor-pointer transition-transform duration-300 hover:rotate-x-32 hover:scale-125 hover:translate-z-20 transform-gpu'
+                  className='text-white text-sm underline'
                 >
                   {showPassword ? 'Скрыть пароли' : 'Показать пароли'}
                 </button>
@@ -213,9 +246,7 @@ export default function UserPage() {
                 {message && (
                   <p
                     className={`mt-2 ${
-                      message.includes('успешно')
-                        ? 'text-green-400'
-                        : 'text-red-500'
+                      message.includes('успешно') ? 'text-green-400' : 'text-red-500'
                     }`}
                   >
                     {message}
@@ -231,14 +262,16 @@ export default function UserPage() {
             </div>
           </div>
         )}
+
+        {/* Модалка смены имени */}
         {modalOpenN && (
           <div
-            className='fixed inset-0 flex items-center justify-center bg-gray-950/20 backdrop-blur-3xl bg-opacity-70 z-50 text-white'
+            className='fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 text-white'
             onClick={closeModalN}
           >
             <div
               className='bg-gray-900 rounded-lg p-6 w-full max-w-md'
-              onClick={e => e.stopPropagation()} // Чтобы клик по модалке не закрывал
+              onClick={e => e.stopPropagation()}
             >
               <h2 className='text-xl mb-4'>Сменить Имя</h2>
               <form onSubmit={handleChangeName} className='flex flex-col gap-4'>
@@ -247,21 +280,19 @@ export default function UserPage() {
                   placeholder='Новое Имя'
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
+                  className='p-2 text-lg text-center border border-gray-800 rounded-2xl outline-none'
                   required
                 />
                 <button
                   type='submit'
                   className='bg-blue-600 py-2 rounded text-white font-semibold'
                 >
-                  Обновить пароль
+                  Обновить имя
                 </button>
                 {message && (
                   <p
                     className={`mt-2 ${
-                      message.includes('успешно')
-                        ? 'text-green-400'
-                        : 'text-red-500'
+                      message.includes('успешно') ? 'text-green-400' : 'text-red-500'
                     }`}
                   >
                     {message}

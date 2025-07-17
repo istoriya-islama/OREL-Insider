@@ -1,70 +1,69 @@
 'use client'
 
-import { HeaderAdmin } from '@/Components/HeaderAdmin'
-import ORELInsider from '@/Components/ORELInsider'
 import { useEffect, useState } from 'react'
+import { supabase } from '@/utils/supabase'
+import ORELInsider from '@/Components/ORELInsider'
+import { HeaderAdmin } from '@/Components/HeaderAdmin' // если путь корректный
 
 type User = {
+  id: string
   name: string
   email: string
-  password?: string
 } | null
 
 export default function UserPage() {
   const [user, setUser] = useState<User>(null)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const userString = localStorage.getItem('user')
-    if (userString) {
-      setUser(JSON.parse(userString))
-    } else {
-      window.location.href = '/pages/auth'
+    async function fetchUser() {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getUser()
+
+      const userInfo = sessionData?.user
+      if (!userInfo) {
+        window.location.href = '/pages/auth'
+        return
+      }
+
+      const userId = userInfo.id
+
+      // Получаем username из profiles
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single()
+
+      if (profileError || !profile) {
+        console.error('Ошибка загрузки профиля:', profileError)
+        return
+      }
+
+      setUser({
+        id: userId,
+        name: profile.username,
+        email: userInfo.email || '',
+      })
+
+      setLoading(false)
     }
+
+    fetchUser()
   }, [])
 
-  const openModal = () => {
-    setMessage('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setModalOpen(true)
-  }
-
-  const closeModal = () => setModalOpen(false)
-
-  const handleChangePassword = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (newPassword.length < 6) {
-      setMessage('Пароль должен быть не менее 6 символов')
-      return
-    }
-
-    if (newPassword !== confirmPassword) {
-      setMessage('Пароли не совпадают')
-      return
-    }
-
-    if (user) {
-      const updatedUser = { ...user, password: newPassword }
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-      setUser(updatedUser)
-      setMessage('Пароль успешно обновлен')
-
-      setTimeout(() => {
-        closeModal()
-      }, 1500)
-    }
+  if (loading) {
+    return (
+      <p className='text-center pt-70 text-4xl font-bold bg-gradient-to-r from-blue-600 to-black bg-clip-text text-transparent'>
+        Загрузка...
+      </p>
+    )
   }
 
   if (!user) return null
 
   return (
     <span>
-      <HeaderAdmin user={user.name[0]} />
+      <HeaderAdmin />
       <div className='border border-blue-900/50 backdrop-blur-7xl p-10 m-10 rounded-2xl bg-gray-950/40 shadow-2xl shadow-blue-950'>
         <h1 className='text-5xl mb-6 font-extrabold'>
           Добро пожаловать, {user.name}!
