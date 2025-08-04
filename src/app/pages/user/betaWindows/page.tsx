@@ -1,7 +1,6 @@
 'use client'
 
 import { HeaderAdmin } from '@/Components/HeaderAdmin'
-import ORELInsider from '@/Components/ORELInsider'
 import { useEffect, useState } from 'react'
 
 type User = {
@@ -37,24 +36,47 @@ export default function UserPage() {
         <h1 className='text-5xl mb-6 font-extrabold'>
           Beta версии программ для Windows:
         </h1>
-				<div className='flex justify-center items-center gap-4'>
-					<div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
-						<img src="/code.ico" alt="OREL Code Editor" />
-						<h1 className='text-xl font-bold'>OREL Editor Code</h1>
-						<p className='text-md font-normal'>Версия: BETA</p>
-						<p className='text-md font-normal'>Начало разработки: 2024</p>
-						<p className='text-md font-normal mb-2'>Конец разработки: ...</p>
-						<a href='https://mega.nz/file/MqtjWASK#_gaEzJCII4C4eiYRxqkr6dico23vuqALnJJF4tWf0z4' className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'>Скачать</a>
-					</div>
-					<div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
-						<img src="/paint.ico" alt="OREL Paint" />
-						<h1 className='text-xl font-bold'>OREL Paint</h1>
-						<p className='text-md font-normal'>Версия: BETA</p>
-						<p className='text-md font-normal'>Начало разработки: 2023</p>
-						<p className='text-md font-normal mb-2'>Конец разработки: 2023</p>
-						<a href='https://mega.nz/file/wy1wzY5R#VtQqywDzbzTWN_mZ6gSKgC7vHahgujiadiKPvBut-vk' className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'>Скачать</a>
-					</div>
-				</div>
+        <div className='flex justify-center items-center gap-4'>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/code.ico' alt='OREL Code Editor' />
+            <h1 className='text-xl font-bold'>OREL Editor Code</h1>
+            <p className='text-md font-normal'>Версия: BETA</p>
+            <p className='text-md font-normal'>Начало разработки: 2024</p>
+            <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
+            <a
+              href='https://mega.nz/file/MqtjWASK#_gaEzJCII4C4eiYRxqkr6dico23vuqALnJJF4tWf0z4'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/paint.ico' alt='OREL Paint' />
+            <h1 className='text-xl font-bold'>OREL Paint</h1>
+            <p className='text-md font-normal'>Версия: BETA</p>
+            <p className='text-md font-normal'>Начало разработки: 2023</p>
+            <p className='text-md font-normal mb-2'>Конец разработки: 2023</p>
+            <a
+              href='https://mega.nz/file/wy1wzY5R#VtQqywDzbzTWN_mZ6gSKgC7vHahgujiadiKPvBut-vk'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/weather.ico' alt='OREL Погода' />
+            <h1 className='text-xl font-bold'>OREL Weather 2.2</h1>
+            <p className='text-md font-normal'>Версия: Beta</p>
+            <p className='text-md font-normal'>Начало разработки: 2025</p>
+            <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
+            <a
+              href='https://mega.nz/file/9n0nESRS#qOphmzqCx9YsAN3jdC_kF6bWjGTtWu48XRzrI2uRaQU'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
+        </div>
       </div>
     </span>
   )
