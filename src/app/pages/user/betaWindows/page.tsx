@@ -41,7 +41,9 @@ export default function UserPage() {
             <img src='/code.ico' alt='OREL Code Editor' />
             <h1 className='text-xl font-bold'>OREL Editor Code</h1>
             <p className='text-md font-normal'>Версия: BETA</p>
-            <p className='text-md font-normal'>Начало разработки: 2024</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 3 июня 2024
+            </p>
             <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
             <a
               href='https://mega.nz/file/MqtjWASK#_gaEzJCII4C4eiYRxqkr6dico23vuqALnJJF4tWf0z4'
@@ -54,8 +56,12 @@ export default function UserPage() {
             <img src='/paint.ico' alt='OREL Paint' />
             <h1 className='text-xl font-bold'>OREL Paint</h1>
             <p className='text-md font-normal'>Версия: BETA</p>
-            <p className='text-md font-normal'>Начало разработки: 2023</p>
-            <p className='text-md font-normal mb-2'>Конец разработки: 2023</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 13 ноября 2023
+            </p>
+            <p className='text-md font-normal mb-2'>
+              Конец разработки: 13 ноября 2023
+            </p>
             <a
               href='https://mega.nz/file/wy1wzY5R#VtQqywDzbzTWN_mZ6gSKgC7vHahgujiadiKPvBut-vk'
               className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
@@ -67,8 +73,12 @@ export default function UserPage() {
             <img src='/weather.ico' alt='OREL Погода' />
             <h1 className='text-xl font-bold'>OREL Weather 2.2</h1>
             <p className='text-md font-normal'>Версия: Beta</p>
-            <p className='text-md font-normal'>Начало разработки: 2025</p>
-            <p className='text-md font-normal mb-2'>Конец разработки: 2025</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 4 августа 2025
+            </p>
+            <p className='text-md font-normal mb-2'>
+              Конец разработки: 8 августа 2025
+            </p>
             <a
               href='https://mega.nz/file/9n0nESRS#qOphmzqCx9YsAN3jdC_kF6bWjGTtWu48XRzrI2uRaQU'
               className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
@@ -82,7 +92,26 @@ export default function UserPage() {
             <img src='/weather.ico' alt='OREL Погода' />
             <h1 className='text-xl font-bold'>OREL Weather 2.2</h1>
             <p className='text-md font-normal'>Версия: Beta 2</p>
-            <p className='text-md font-normal'>Начало разработки: 2025</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 8 августа 2025
+            </p>
+            <p className='text-md font-normal mb-2'>
+              Конец разработки: 11 августа 2025
+            </p>
+            <a
+              href='https://mega.nz/file/o3NjDZyI#ZMdfI14qlO2xou0bV6Js2LbuZXAGQzMeRMW0otpxSq4'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/weather.ico' alt='OREL Погода' />
+            <h1 className='text-xl font-bold'>OREL Weather 2.2</h1>
+            <p className='text-md font-normal'>Версия: Beta 3</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 11 августа 2025
+            </p>
             <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
             <a
               href='https://mega.nz/file/o3NjDZyI#ZMdfI14qlO2xou0bV6Js2LbuZXAGQzMeRMW0otpxSq4'
