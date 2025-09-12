@@ -112,9 +112,24 @@ export default function UserPage() {
             <p className='text-md font-normal'>
               Начало разработки: 11 августа 2025
             </p>
-            <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
+            <p className='text-md font-normal mb-2'>Конец разработки: 12 августа 2025</p>
             <a
               href='https://mega.nz/file/o3NjDZyI#ZMdfI14qlO2xou0bV6Js2LbuZXAGQzMeRMW0otpxSq4'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/clock.ico' alt='OREL Погода' />
+            <h1 className='text-xl font-bold'>OREL Clock 1.1</h1>
+            <p className='text-md font-normal'>Версия: Beta 3</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 19 сентября 2025
+            </p>
+            <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
+            <a
+              href='https://mega.nz/file/Bu0EDJKK#ctwDixJOouWBFF46R4M0F5txxMJ7Fal5UgOarjZm7UY'
               className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
             >
               Скачать
