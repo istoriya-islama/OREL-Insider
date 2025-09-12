@@ -123,7 +123,7 @@ export default function UserPage() {
           <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
             <img src='/clock.ico' alt='OREL Погода' />
             <h1 className='text-xl font-bold'>OREL Clock 1.1</h1>
-            <p className='text-md font-normal'>Версия: Beta 3</p>
+            <p className='text-md font-normal'>Версия: Beta</p>
             <p className='text-md font-normal'>
               Начало разработки: 19 сентября 2025
             </p>
