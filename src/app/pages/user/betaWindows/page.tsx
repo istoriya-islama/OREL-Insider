@@ -135,6 +135,21 @@ export default function UserPage() {
               Скачать
             </a>
           </div>
+          <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
+            <img src='/weather.ico' alt='OREL Погода' />
+            <h1 className='text-xl font-bold'>OREL Weather 2.3</h1>
+            <p className='text-md font-normal'>Версия: Beta</p>
+            <p className='text-md font-normal'>
+              Начало разработки: 28 сентября 2025
+            </p>
+            <p className='text-md font-normal mb-2'>Конец разработки: ...</p>
+            <a
+              href='https://mega.nz/file/c2sgWIKY#1RdL8EU0PSsOflvY9QL8_n7h-Rjyx1X2wj6P6d7Fb24'
+              className='text-center mx-25 mt-2 p-2 border border-blue-950/50 rounded-lg bg-gray-800 transition hover:bg-gray-900 shadow-xl shadow-blue-900 hover:scale-110'
+            >
+              Скачать
+            </a>
+          </div>
         </div>
       </div>
     </span>
