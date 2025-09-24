@@ -233,7 +233,7 @@ export default function UserPage() {
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
-                  className='text-white text-sm underline'
+                  className='text-white cursor-pointer transition-transform duration-300 hover:rotate-x-32 hover:scale-125 hover:translate-z-20 transform-gpu'
                 >
                   {showPassword ? 'Скрыть пароли' : 'Показать пароли'}
                 </button>
