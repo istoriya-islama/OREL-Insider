@@ -135,6 +135,8 @@ export default function UserPage() {
               Скачать
             </a>
           </div>
+        </div>
+        <div className='flex justify-center items-center gap-4 mt-8'>
           <div className='bg-blue-950/20 backdrop-blur-3xl rounded-4xl p-5 shadow-2xl shadow-blue-500'>
             <img src='/weather.ico' alt='OREL Погода' />
             <h1 className='text-xl font-bold'>OREL Weather 2.3</h1>
