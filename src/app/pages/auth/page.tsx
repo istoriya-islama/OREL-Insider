@@ -18,15 +18,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [info, setInfo] = useState('')
 
-  const validateEmail = (email: string) => {
-    // Простая проверка email
-    return /\S+@\S+\.\S+/.test(email)
-  }
-
-  const validatePassword = (password: string) => {
-    // Минимум 8 символов, хотя можно и больше
-    return password.length >= 8
-  }
+  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email)
+  const validatePassword = (password: string) => password.length >= 8
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -62,10 +55,13 @@ export default function Auth() {
       return
     }
 
-    // 1. Регистрируем
-    const { error: signUpError } = await supabase.auth.signUp({
+    // 1. Регистрируем пользователя
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { username: name }, // имя сохраняем в метаданных
+      },
     })
 
     if (signUpError) {
@@ -75,56 +71,22 @@ export default function Auth() {
       return
     }
 
-    // 2. Вход (теперь у нас будет токен)
-    const { data: signInData, error: signInError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-    if (signInError) {
-      const tr = await translate(signInError.message, { to: 'ru' })
-      setError(tr.text)
-      setLoading(false)
-      return
-    }
-
-    const userId = signInData.user.id
-
-    // 3. Теперь безопасно вставить профиль
-    const { error: profileInsertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        username: name,
-      })
-
-    if (profileInsertError) {
-      setError('Ошибка создания профиля: ' + profileInsertError.message)
-      setLoading(false)
-      return
-    }
-
-    // 4. Если включена email-подтверждение
-    if (!signInData.user.confirmed_at) {
+    // 2. Если почта требует подтверждения
+    if (!data.user?.email_confirmed_at) {
       setInfo('Регистрация прошла! Подтвердите email.')
       setLoading(false)
       return
     }
 
-    // 5. Всё прошло успешно — переход на профиль
+    // 3. Если email подтверждён → редирект
     setLoading(false)
-    router.push('/pages/user')
+    router.push('/user')
   }
 
   return (
     <div className='w-full h-screen p-5 flex items-center justify-center bg-gradient-to-r from-blue-500 via-black to-blue-800 animate-gradient-x'>
       <main className='w-4/6 border border-gray-800 rounded-lg shadow-lg shadow-blue-800 text-white p-10 m-20 backdrop-blur-lg bg-gray-900/50'>
-        <form
-          className='flex flex-col gap-5'
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form className='flex flex-col gap-5' onSubmit={handleSubmit} noValidate>
           <h1 className='text-center text-2xl font-bold'>Регистрация</h1>
 
           <input
@@ -187,7 +149,7 @@ export default function Auth() {
           {info && <p className='text-green-400 text-center mt-2'>{info}</p>}
 
           <p className='text-center'>
-            Уже есть аккаунт? <a href='auth/login'>Войти</a>
+            Уже есть аккаунт? <a href='/auth/login'>Войти</a>
           </p>
         </form>
       </main>
