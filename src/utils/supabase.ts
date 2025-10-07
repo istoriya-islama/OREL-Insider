@@ -8,5 +8,9 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and Key must be defined in environment variables.");
 }
 
+console.log("SUPABASE URL:", supabaseUrl)
+console.log("SUPABASE KEY:", supabaseKey?.slice(0, 8) + "...")
+
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
         

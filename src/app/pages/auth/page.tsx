@@ -1,11 +1,11 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/utils/supabase'
 import translate from 'google-translate-api-x'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
-export default function Auth() {
+export default function Register() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -16,10 +16,6 @@ export default function Auth() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [info, setInfo] = useState('')
-
-  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email)
-  const validatePassword = (password: string) => password.length >= 8
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -28,24 +24,13 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setInfo('')
     setLoading(true)
 
     const { email, password, passwordConfirm, name } = formData
 
-    // Валидация
+    // простая валидация
     if (!email || !password || !passwordConfirm || !name) {
       setError('Все поля обязательны')
-      setLoading(false)
-      return
-    }
-    if (!validateEmail(email)) {
-      setError('Некорректный email')
-      setLoading(false)
-      return
-    }
-    if (!validatePassword(password)) {
-      setError('Пароль должен быть не менее 8 символов')
       setLoading(false)
       return
     }
@@ -55,32 +40,39 @@ export default function Auth() {
       return
     }
 
-    // 1. Регистрируем пользователя
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username: name }, // имя сохраняем в метаданных
-      },
-    })
+    try {
+      // регистрация
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: { username: name } },
+      })
 
-    if (signUpError) {
-      const tr = await translate(signUpError.message, { to: 'ru' })
-      setError(tr.text)
+      if (signUpError) {
+        const tr = await translate(signUpError.message, { to: 'ru' }).catch(() => null)
+        setError(tr?.text || signUpError.message)
+        setLoading(false)
+        return
+      }
+
+      if (!data.user) {
+        setError('Не удалось создать пользователя')
+        setLoading(false)
+        return
+      }
+
+      // если подтверждение email выключено → сразу логиним и редиректим
+      if (data.user.email_confirmed_at) {
+        router.push('/pages/user')
+      } else {
+        setError('Проверьте почту и подтвердите email')
+      }
+
+    } catch (err) {
+      setError('Ошибка при регистрации')
+    } finally {
       setLoading(false)
-      return
     }
-
-    // 2. Если почта требует подтверждения
-    if (!data.user?.email_confirmed_at) {
-      setInfo('Регистрация прошла! Подтвердите email.')
-      setLoading(false)
-      return
-    }
-
-    // 3. Если email подтверждён → редирект
-    setLoading(false)
-    router.push('/user')
   }
 
   return (
@@ -92,7 +84,7 @@ export default function Auth() {
           <input
             type='email'
             name='email'
-            placeholder='Email ваш'
+            placeholder='Email'
             className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
             value={formData.email}
             onChange={handleChange}
@@ -102,7 +94,7 @@ export default function Auth() {
           <input
             type={showPassword ? 'text' : 'password'}
             name='password'
-            placeholder='Пароль ваш'
+            placeholder='Пароль'
             className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
             value={formData.password}
             onChange={handleChange}
@@ -122,7 +114,7 @@ export default function Auth() {
           <input
             type='text'
             name='name'
-            placeholder='Имя ваше'
+            placeholder='Ваше имя'
             className='p-2 text-lg text-center shadow-xl shadow-blue-900/50 border border-gray-800 rounded-2xl outline-0'
             value={formData.name}
             onChange={handleChange}
@@ -134,7 +126,7 @@ export default function Auth() {
             disabled={loading}
             className='flex items-center justify-center cursor-pointer border border-blue-800 w-3/6 rounded-3xl p-2 bg-gray-950 mx-50 disabled:opacity-50'
           >
-            {loading ? 'Регистрация...' : 'Отправить'}
+            {loading ? 'Регистрируем...' : 'Отправить'}
           </button>
 
           <button
@@ -146,10 +138,9 @@ export default function Auth() {
           </button>
 
           {error && <p className='text-red-500 text-center mt-2'>{error}</p>}
-          {info && <p className='text-green-400 text-center mt-2'>{info}</p>}
 
           <p className='text-center'>
-            Уже есть аккаунт? <a href='/auth/login'>Войти</a>
+            Уже есть аккаунт? <a href='/pages/auth/login'>Войти</a>
           </p>
         </form>
       </main>
